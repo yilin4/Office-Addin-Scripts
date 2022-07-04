@@ -9,6 +9,7 @@ import XRegExp = require("xregexp");
 
 export interface ICustomFunctionsMetadata {
   allowErrorForDataTypeAny?: boolean;
+  allowCustomDataForDataTypeAny?: boolean;
   functions: IFunction[];
 }
 
@@ -135,13 +136,13 @@ const TYPE_CUSTOM_FUNCTION_INVOCATION = "customfunctions.invocation";
 
 type CustomFunctionsSchemaDimensionality = "invalid" | "scalar" | "matrix";
 
-export type MetadataOptions = { allowErrorForDataTypeAny: boolean };
+export type MetadataOptions = { allowErrorForDataTypeAny?: boolean; allowCustomDataForDataTypeAny?: boolean };
 
 /**
  * Generate the metadata of the custom functions
  * @param inputFile - File that contains the custom functions
  * @param outputFileName - Name of the file to create (i.e functions.json)
- * @param metadataOptions - Additional properties like allowErrorForDataTypeAny
+ * @param metadataOptions - Additional properties like allowErrorForDataTypeAny and allowCustomDataForDataTypeAny
  */
 export async function generateCustomFunctionsMetadata(
   inputFile: string,
@@ -170,6 +171,8 @@ export async function generateCustomFunctionsMetadata(
       };
       if (metadataOptions?.allowErrorForDataTypeAny != null)
         customFunctionsMetadata.allowErrorForDataTypeAny = metadataOptions.allowErrorForDataTypeAny;
+      if (metadataOptions?.allowCustomDataForDataTypeAny != null)
+        customFunctionsMetadata.allowCustomDataForDataTypeAny = metadataOptions.allowCustomDataForDataTypeAny;
 
       generateResults.metadataJson = JSON.stringify(customFunctionsMetadata, null, 4);
       generateResults.associate = [...parseTreeResult.associate];

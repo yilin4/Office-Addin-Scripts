@@ -15,6 +15,10 @@ commander.version(process.env.npm_package_version || "(version not available)");
 commander
   .command("generate <source-file> [output-file]")
   .option("--allow-error-for-data-type-any", "Allow a custom function to process errors as input values.")
+  .option(
+    "--allow-custom-data-for-data-type-any",
+    "Allows a custom function to accept data types as parameters and return values."
+  )
   .description("Generate the metadata for the custom functions from the source code.")
   .action(commands.generate);
 

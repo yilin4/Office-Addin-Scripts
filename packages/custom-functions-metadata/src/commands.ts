@@ -13,8 +13,18 @@ export async function generate(inputPath: string, outputPath: string, command: c
     if (!inputPath) {
       throw new Error("You need to provide the path to the source file for custom functions.");
     }
-    const additionalOptions: MetadataOptions | null =
-      command.allowErrorForDataTypeAny != null ? { allowErrorForDataTypeAny: command.allowErrorForDataTypeAny } : null;
+    let additionalOptions: MetadataOptions | null;
+    if (command.allowErrorForDataTypeAny == null && command.allowCustomDataForDataTypeAny == null) {
+      additionalOptions = null;
+    } else {
+      additionalOptions = {};
+      if (command.allowErrorForDataTypeAny != null) {
+        additionalOptions.allowErrorForDataTypeAny = command.allowErrorForDataTypeAny;
+      }
+      if (command.allowCustomDataForDataTypeAny != null) {
+        additionalOptions.allowCustomDataForDataTypeAny = command.allowCustomDataForDataTypeAny;
+      }
+    }
     const results = await generateCustomFunctionsMetadata(inputPath, false, additionalOptions);
     if (results.errors.length > 0) {
       console.error("Errors found:");

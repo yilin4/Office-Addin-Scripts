@@ -21,5 +21,6 @@ Syntax:
 Options:
 
 `--allow-error-for-data-type-any`
+`--allow-custom-data-for-data-type-any`
 
 Allow a custom function to process errors as input values.

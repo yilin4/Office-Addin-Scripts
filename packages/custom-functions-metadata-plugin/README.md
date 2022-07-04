@@ -13,7 +13,8 @@ plugins: [
         input: './src/functions/functions.ts',
         output: 'functions.json',
         options: {
-            allowErrorForDataTypeAny: true
+            allowErrorForDataTypeAny: true,
+            allowCustomDataForDataTypeAny, true
         })
     ]
 ```
