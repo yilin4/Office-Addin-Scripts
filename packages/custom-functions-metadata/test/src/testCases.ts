@@ -30,6 +30,7 @@ describe("test cases", function() {
             const testCaseDirPath = path.resolve(testCasesDirPath, testCaseDirName);
             const sourceFileName = `functions.${scriptType}`;
             const sourceFile = path.resolve(testCaseDirPath, sourceFileName);
+            const outputfile = path.resolve(testCaseDirPath, 'expected.json');
             const source: string | undefined = readFileIfExists(sourceFile);
 
             if (source) {
@@ -55,7 +56,7 @@ describe("test cases", function() {
                         }
 
                         // generate metadata
-                        const result = await generateCustomFunctionsMetadata(sourceFile);
+                        const result = await generateCustomFunctionsMetadata(sourceFile, false, outputfile);
 
                         const actualMetadata = result.metadataJson;
                         const actualErrors = (result.errors.length > 0) ? result.errors.join("\n") : undefined;

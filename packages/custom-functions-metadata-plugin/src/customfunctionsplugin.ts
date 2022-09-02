@@ -12,7 +12,7 @@ import { Compiler, sources, WebpackError, NormalModule } from "webpack";
 
 const pluginName = "CustomFunctionsMetadataPlugin";
 
-type Options = { input: string; output: string };
+type Options = { input: string; output: string; outputDir?: string };
 
 class CustomFunctionsMetadataPlugin {
   private options: Options;
@@ -25,12 +25,17 @@ class CustomFunctionsMetadataPlugin {
 
   public apply(compiler: Compiler) {
     const inputFilePath = path.resolve(this.options.input);
+    const outputFilePath = path.resolve(
+      this.options.outputDir || "./dist/",
+      this.options.output
+    );
     let generateResult: IGenerateResult;
 
     compiler.hooks.beforeCompile.tapPromise(pluginName, async () => {
       generateResult = await generateCustomFunctionsMetadata(
         inputFilePath,
-        true
+        true,
+        outputFilePath
       );
     });
 

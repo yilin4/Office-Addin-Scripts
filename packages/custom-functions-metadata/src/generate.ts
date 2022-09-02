@@ -9,6 +9,8 @@ import XRegExp = require("xregexp");
 
 export interface ICustomFunctionsMetadata {
   functions: IFunction[];
+  allowErrorForDataTypeAny?: boolean;
+  allowCustomDataForDataTypeAny?: boolean;
 }
 
 export interface IFunction {
@@ -134,6 +136,10 @@ const TYPE_CUSTOM_FUNCTION_INVOCATION = "customfunctions.invocation";
 
 type CustomFunctionsSchemaDimensionality = "invalid" | "scalar" | "matrix";
 
+const ALLOW_ERROR_FOR_DATA_TYPE_ANY = "allowErrorForDataTypeAny";
+const ALLOW_CUSTOM_DATA_FOR_DATA_TYPE_ANY = "allowCustomDataForDataTypeAny";
+
+type MetadataOptions = { allowErrorForDataTypeAny?: boolean; allowCustomDataForDataTypeAny?: boolean };
 /**
  * Generate the metadata of the custom functions
  * @param inputFile - File that contains the custom functions
@@ -141,13 +147,24 @@ type CustomFunctionsSchemaDimensionality = "invalid" | "scalar" | "matrix";
  */
 export async function generateCustomFunctionsMetadata(
   inputFile: string,
-  wantConsoleOutput: boolean = false
+  wantConsoleOutput: boolean = false,
+  outputFile: string = ""
 ): Promise<IGenerateResult> {
   const generateResults: IGenerateResult = {
     metadataJson: "",
     associate: [],
     errors: [],
   };
+  let metadataOptions: MetadataOptions = {};
+  if (fs.existsSync(outputFile)) {
+    const extraMetadata = JSON.parse(fs.readFileSync(outputFile, "utf-8"));
+    if (extraMetadata[ALLOW_CUSTOM_DATA_FOR_DATA_TYPE_ANY] != null) {
+      metadataOptions.allowCustomDataForDataTypeAny = extraMetadata[ALLOW_CUSTOM_DATA_FOR_DATA_TYPE_ANY];
+    }
+    if (extraMetadata[ALLOW_ERROR_FOR_DATA_TYPE_ANY] != null) {
+      metadataOptions.allowErrorForDataTypeAny = extraMetadata[ALLOW_ERROR_FOR_DATA_TYPE_ANY];
+    }
+  }
 
   if (fs.existsSync(inputFile)) {
     const sourceCode = fs.readFileSync(inputFile, "utf-8");
@@ -160,7 +177,14 @@ export async function generateCustomFunctionsMetadata(
         generateResults.errors.forEach((err) => console.error(err));
       }
     } else {
-      generateResults.metadataJson = JSON.stringify({ functions: parseTreeResult.functions }, null, 4);
+      let customFunctionMetadata: ICustomFunctionsMetadata = { functions: parseTreeResult.functions };
+      if (metadataOptions.allowCustomDataForDataTypeAny != null) {
+        customFunctionMetadata.allowCustomDataForDataTypeAny = metadataOptions.allowCustomDataForDataTypeAny;
+      }
+      if (metadataOptions.allowErrorForDataTypeAny != null) {
+        customFunctionMetadata.allowErrorForDataTypeAny = metadataOptions.allowErrorForDataTypeAny;
+      }
+      generateResults.metadataJson = JSON.stringify(customFunctionMetadata, null, 4);
       generateResults.associate = [...parseTreeResult.associate];
     }
   } else {
